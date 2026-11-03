@@ -20,30 +20,37 @@ function selectedBundle() {
 
 function renderSummary() {
   const bundle = selectedBundle();
-  const network = state.catalog.networks.find((item) => item.id === state.network);
+  const network = state.catalog?.networks.find((item) => item.id === state.network);
   const summaryNetwork = document.getElementById("sum-network");
+  const summaryPhone = phoneInput?.value?.trim() || "";
   summaryNetwork.textContent = network ? network.name : "—";
   summaryNetwork.dataset.network = network?.id || "";
   document.getElementById("sum-bundle").textContent = bundle ? bundle.size : "—";
   document.getElementById("sum-validity").textContent = bundle ? bundle.validity : "—";
-  document.getElementById("sum-phone").textContent = phoneInput.value || "—";
+  document.getElementById("sum-phone").textContent = summaryPhone || "—";
   document.getElementById("sum-total").textContent = bundle ? `GHS ${bundle.priceGhs}` : "GHS 0";
-  document.getElementById("selected-bundle-label").textContent = bundle
-    ? `${network?.name || "Network"} · ${bundle.size} · GHS ${bundle.priceGhs}`
-    : "Choose a bundle above";
+  const label = document.getElementById("selected-bundle-label");
+  if (label) {
+    label.textContent = bundle
+      ? `${network?.name || "Network"} · ${bundle.size} · GHS ${bundle.priceGhs}`
+      : "Choose a bundle above";
+  }
 }
 
 function renderNetworks() {
+  if (!networkBox) return;
   networkBox.innerHTML = "";
   state.catalog.networks.forEach((network) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = `choice ${network.id} network-${network.id} ${state.network === network.id ? "active" : ""}`;
     button.dataset.network = network.id;
+    button.setAttribute("aria-pressed", state.network === network.id ? "true" : "false");
     button.innerHTML = `<strong>${network.name}</strong><small>${network.prefixes.join(", ")}</small>`;
     button.addEventListener("click", () => {
       state.network = network.id;
-      state.bundleId = state.catalog.bundles[network.id][0].id;
+      const available = state.catalog.bundles[network.id] || [];
+      state.bundleId = available[0]?.id || null;
       renderNetworks();
       renderBundles();
       renderSummary();
@@ -119,9 +126,11 @@ function renderAllBundles() {
 function renderBundles() {
   const recipientDetails = document.querySelector(".recipient-details");
   const heading = document.getElementById("bundle-heading");
-  heading.textContent = "";
+  if (!heading) return;
+  heading.textContent = "Choose your bundle";
   heading.className = "bundle-heading";
   heading.removeAttribute("data-network");
+  if (!bundleBox) return;
   bundleBox.innerHTML = "";
 
   const columns = document.createElement("div");
@@ -131,30 +140,27 @@ function renderBundles() {
     column.className = `network-bundle-column network-bundle-column--${network.id} ${network.id === state.network ? "is-selected" : ""}`;
     column.innerHTML = `<div class="network-bundle-column__heading"><h3>${network.name}</h3><span>${network.id === state.network ? "Selected" : "Available"}</span></div>`;
 
-    if (true) {
-      const choices = document.createElement("div");
-      choices.className = "choices network-bundle-column__choices";
-      (state.catalog.bundles[network.id] || []).forEach((bundle) => {
-        const option = document.createElement("div");
-        option.className = `bundle-option ${state.bundleId === bundle.id ? "selected" : ""}`;
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = `bundle ${state.bundleId === bundle.id ? "active" : ""}`;
-        button.innerHTML = `<strong>${bundle.size}</strong><small>GHS ${bundle.priceGhs} · ${bundle.validity}</small>`;
-        button.addEventListener("click", () => {
-          state.network = network.id;
-          state.bundleId = bundle.id;
-          renderBundles();
-          renderSummary();
-        });
-        option.appendChild(button);
-        if (state.bundleId === bundle.id) option.appendChild(recipientDetails);
-        choices.appendChild(option);
+    const choices = document.createElement("div");
+    choices.className = "choices network-bundle-column__choices";
+    (state.catalog.bundles[network.id] || []).forEach((bundle) => {
+      const option = document.createElement("div");
+      option.className = `bundle-option ${state.bundleId === bundle.id ? "selected" : ""}`;
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = `bundle ${state.bundleId === bundle.id ? "active" : ""}`;
+      button.innerHTML = `<strong>${bundle.size}</strong><small>GHS ${bundle.priceGhs} · ${bundle.validity}</small>`;
+      button.addEventListener("click", () => {
+        state.network = network.id;
+        state.bundleId = bundle.id;
+        renderNetworks();
+        renderBundles();
+        renderSummary();
       });
-      column.appendChild(choices);
-    } else {
-      column.insertAdjacentHTML("beforeend", `<p class="network-bundle-column__hint">Select ${network.name} above to view bundles here.</p>`);
-    }
+      option.appendChild(button);
+      if (state.bundleId === bundle.id) option.appendChild(recipientDetails);
+      choices.appendChild(option);
+    });
+    column.appendChild(choices);
     columns.appendChild(column);
   });
   bundleBox.appendChild(columns);
@@ -170,16 +176,31 @@ async function loadCatalog() {
   state.bundleId = availableBundles.some((bundle) => bundle.id === requestedBundle)
     ? requestedBundle
     : availableBundles[0]?.id;
+  renderNetworks();
   renderBundles();
   renderSummary();
 }
 
-phoneInput.addEventListener("input", renderSummary);
+phoneInput.addEventListener("input", () => {
+  const phone = phoneInput.value.replace(/\D/g, "");
+  if (phone !== phoneInput.value) {
+    phoneInput.value = phone;
+  }
+  renderSummary();
+});
 
 document.getElementById("checkout-form").addEventListener("submit", async (event) => {
   event.preventDefault();
   errorEl.textContent = "";
   const payBtn = document.getElementById("pay-btn");
+  const phone = phoneInput.value.trim();
+
+  if (!/^(0|233)[0-9]{9,10}$/.test(phone)) {
+    errorEl.textContent = "Please enter a valid Ghana mobile number. Example: 0241234567";
+    phoneInput.focus();
+    return;
+  }
+
   payBtn.disabled = true;
   payBtn.textContent = "Starting payment...";
 
@@ -190,8 +211,8 @@ document.getElementById("checkout-form").addEventListener("submit", async (event
       body: JSON.stringify({
         network: state.network,
         bundleId: state.bundleId,
-        phone: phoneInput.value,
-        email: document.getElementById("email").value
+        phone,
+        email: document.getElementById("email").value.trim()
       })
     });
     const data = await response.json();

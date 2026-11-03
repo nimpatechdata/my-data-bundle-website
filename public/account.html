@@ -25,6 +25,11 @@
         <p class="account-kicker">OPTIONAL CUSTOMER ACCOUNT</p>
         <h1>Buy as a guest or keep your account handy.</h1>
         <p>Sign up to get a personalized greeting and make it easier to return to NImpatech. You can always buy data without signing in.</p>
+        <div class="account-benefits" aria-label="Account benefits">
+          <span>Fast re-ordering</span>
+          <span>Delivery tracking</span>
+          <span>Guest checkout always available</span>
+        </div>
       </section>
       <section class="account-card" id="account-card">
         <div class="account-tabs" role="tablist" aria-label="Customer account">
@@ -33,7 +38,12 @@
         </div>
         <div class="account-panel" id="signin-panel" role="tabpanel" aria-labelledby="signin-tab">
           <h2>Welcome back</h2>
-          <p class="account-intro">Sign in to see your name on the homepage.</p>
+          <p class="account-intro">Sign in to see your name on the homepage and keep your order history in one place.</p>
+          <div class="account-trust-list" aria-label="Trust signals">
+            <span>Secure access</span>
+            <span>Fast delivery updates</span>
+            <span>Support available</span>
+          </div>
           <form id="signin-form" class="account-form">
             <label for="signin-email">Email address</label>
             <input id="signin-email" name="email" type="email" autocomplete="username" required />
@@ -45,7 +55,12 @@
         </div>
         <div class="account-panel" id="signup-panel" role="tabpanel" aria-labelledby="signup-tab" hidden>
           <h2>Create your account</h2>
-          <p class="account-intro">It’s free, and guest checkout remains available.</p>
+          <p class="account-intro">It’s free, and guest checkout remains available anytime you prefer.</p>
+          <div class="account-trust-list" aria-label="Trust signals">
+            <span>No extra fee</span>
+            <span>Saved profile</span>
+            <span>Easy order tracking</span>
+          </div>
           <form id="signup-form" class="account-form">
             <label for="signup-name">Full name</label>
             <input id="signup-name" name="fullName" autocomplete="name" required maxlength="90" />

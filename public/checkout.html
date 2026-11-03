@@ -22,22 +22,31 @@
 
       <p class="kicker">Checkout</p>
       <h1>Buy a data bundle</h1>
-      <p class="lead">Select MTN, Telecel or AirtelTigo, choose a size, and enter the phone number that should receive the data.</p>
+      <p class="lead">Select your network, choose a bundle, and send it to the right phone number in minutes.</p>
+
+      <div class="checkout-progress" aria-label="Checkout progress">
+        <span class="checkout-progress__step is-active">1. Network</span>
+        <span class="checkout-progress__step">2. Bundle</span>
+        <span class="checkout-progress__step">3. Payment</span>
+      </div>
 
       <section class="checkout">
         <form class="panel" id="checkout-form">
           <div class="checkout-selection">
+          <div class="checkout-section-title">Choose your network</div>
+          <div class="choices network-choices" id="network-choices" aria-live="polite"></div>
           <div class="bundle-heading" id="bundle-heading" aria-live="polite"></div>
           <div class="choices" id="bundle-choices"></div>
           <div class="recipient-details" aria-live="polite">
             <p class="selection-hint">Selected bundle: <strong id="selected-bundle-label">—</strong></p>
             <label for="phone">Recipient phone number</label>
-            <input id="phone" name="phone" inputmode="tel" placeholder="0241234567" maxlength="13" required />
+            <input id="phone" name="phone" inputmode="tel" autocomplete="tel" placeholder="0241234567" maxlength="13" required aria-describedby="phone-help" />
+            <small class="field-note" id="phone-help">Use a valid Ghana mobile number for instant delivery.</small>
 
             <label for="email">Email for your purchase receipt <span>(optional)</span></label>
             <input id="email" name="email" type="email" placeholder="you@email.com" autocomplete="email" />
 
-            <p class="error" id="error"></p>
+            <p class="error" id="error" aria-live="polite"></p>
             <button class="primary" type="submit" id="pay-btn">Continue to payment</button>
           </div>
           </div>

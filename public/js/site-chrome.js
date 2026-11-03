@@ -24,10 +24,18 @@
   }
 
   const menuBackButton = document.getElementById("menu-back-button");
+  const dashboardNav = document.getElementById("dashboard-nav");
   if (menuBackButton) {
-    const dashboardNav = document.getElementById("dashboard-nav");
     if (dashboardNav) dashboardNav.prepend(menuBackButton);
     menuBackButton.addEventListener("click", goBack);
+  }
+  if (dashboardNav) {
+    dashboardNav.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => {
+        dashboardNav.classList.remove("is-open");
+        if (menuToggle) menuToggle.setAttribute("aria-expanded", "false");
+      });
+    });
   }
 
   const welcomeTitle = document.getElementById("welcome-title");
@@ -50,7 +58,6 @@
     customerAccountLink.href = "/account.html";
   }
 
-  const dashboardNav = document.getElementById("dashboard-nav");
   if (menuToggle && dashboardNav) {
     menuToggle.addEventListener("click", () => {
       const open = dashboardNav.classList.toggle("is-open");
