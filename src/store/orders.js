@@ -105,7 +105,7 @@ async function claimOrderForProcessing(id, payment) {
       updated_at: new Date().toISOString()
     })
     .eq("id", id)
-    .eq("status", "awaiting_payment")
+    .in("status", ["awaiting_payment", "payment_failed"])
     .select("*")
     .maybeSingle();
   throwIfError(error);

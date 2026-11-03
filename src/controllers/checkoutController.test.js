@@ -28,7 +28,9 @@ function createQueryBuilder() {
     }
 
     let matching = [...rows.values()].filter((row) =>
-      filters.every(([key, value]) => row[key] === value)
+      filters.every(([key, value]) =>
+        typeof value === "function" ? value(row[key]) : row[key] === value
+      )
     );
     if (action === "update") {
       matching = matching.map((row) => {
@@ -64,6 +66,10 @@ function createQueryBuilder() {
     },
     eq(key, value) {
       filters.push([key, value]);
+      return builder;
+    },
+    in(key, values) {
+      filters.push([key, (value) => values.includes(value)]);
       return builder;
     },
     order(column, options) {
@@ -204,6 +210,62 @@ test("persists paid orders for manual recovery after supplier failure", async ()
   await confirmPayment({ body: { orderId: id, reference: id } }, retryResponse);
   assert.equal(deliveryCount, 1);
   assert.equal(retryResponse.body.status, "delivery_review");
+});
+
+test("keeps an unconfirmed payment retryable and recovers a previously failed order", async () => {
+  const id = `order-${crypto.randomUUID()}`;
+  await orders.createOrder({
+    id,
+    priceGhs: 12.5,
+    status: "awaiting_payment",
+    payment: { reference: id, authorizationUrl: "https://paystack.test/checkout" },
+    delivery: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  });
+
+  let verifyCount = 0;
+  let deliveryCount = 0;
+  paymentService.verifyPayment = async () => {
+    verifyCount += 1;
+    return verifyCount === 1
+      ? { paid: false, reference: id }
+      : { paid: true, reference: id };
+  };
+  receiptService.sendReceipt = async () => ({ sent: false, status: "email_missing" });
+  vtuService.deliverBundle = async () => {
+    deliveryCount += 1;
+    return { delivered: true, provider: "datamart", providerStatus: "COMPLETED" };
+  };
+
+  function response() {
+    return {
+      statusCode: 200,
+      status(code) {
+        this.statusCode = code;
+        return this;
+      },
+      json(body) {
+        this.body = body;
+        return this;
+      }
+    };
+  }
+
+  const pendingResponse = response();
+  await confirmPayment({ body: { orderId: id, reference: id } }, pendingResponse);
+  assert.equal(pendingResponse.statusCode, 402);
+  assert.equal(pendingResponse.body.pending, true);
+  assert.equal((await orders.getOrder(id)).status, "awaiting_payment");
+  assert.equal((await orders.getOrder(id)).payment.authorizationUrl, "https://paystack.test/checkout");
+
+  await orders.updateOrder(id, { status: "payment_failed" });
+  const recoveredResponse = response();
+  await confirmPayment({ body: { orderId: id, reference: id } }, recoveredResponse);
+
+  assert.equal(recoveredResponse.body.status, "delivered");
+  assert.equal(deliveryCount, 1);
+  assert.equal((await orders.getOrder(id)).payment.paid, true);
 });
 
 test("order lookup exposes only customer-safe details for its private reference", async () => {

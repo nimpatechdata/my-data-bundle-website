@@ -228,6 +228,7 @@ async function list(req, res) {
       paymentPaid: Boolean(order.payment?.paid),
       orderReference: order.payment?.reference || order.id,
       deliveryStatus: order.delivery?.providerStatus || null,
+      deliveryMessage: order.delivery?.message || null,
       delivered: Boolean(order.delivery?.delivered),
       failed: Boolean(order.delivery?.failed),
       providerOrderReference: order.delivery?.providerOrderReference || null,

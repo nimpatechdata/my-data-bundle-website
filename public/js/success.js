@@ -25,13 +25,47 @@ async function run() {
   const printButton = document.getElementById("print-receipt");
   printButton.addEventListener("click", () => window.print());
 
-  const confirmResponse = await fetch("/api/payments/confirm", {
+  const requestConfirmation = () => fetch("/api/payments/confirm", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ orderId, reference })
   });
+  const confirmResponse = await requestConfirmation();
 
   const order = await confirmResponse.json();
+  if (!confirmResponse.ok && order.pending) {
+    document.getElementById("title").textContent = "Payment confirmation pending";
+    document.getElementById("status").textContent = "Awaiting Paystack";
+    document.getElementById("message").textContent = order.error;
+    let attempts = 0;
+    const retryTimer = window.setInterval(async () => {
+      attempts += 1;
+      try {
+        const retryResponse = await requestConfirmation();
+        const retryOrder = await retryResponse.json();
+        if (retryResponse.ok) {
+          window.clearInterval(retryTimer);
+          window.location.reload();
+        } else if (attempts >= 20) {
+          window.clearInterval(retryTimer);
+          document.getElementById("message").textContent =
+            "We couldn't confirm the payment yet. Keep your order reference and contact support; do not pay again if you were charged.";
+        } else if (!retryOrder.pending) {
+          window.clearInterval(retryTimer);
+          document.getElementById("message").textContent = retryOrder.error || "Payment confirmation could not be completed. Contact support with your order reference.";
+        }
+      } catch {
+        document.getElementById("message").textContent =
+          "The payment check is temporarily unavailable. We'll retry automatically; do not pay again if you were charged.";
+        if (attempts >= 20) {
+          window.clearInterval(retryTimer);
+          document.getElementById("message").textContent =
+            "We couldn't confirm the payment. Keep your order reference and contact support; do not pay again if you were charged.";
+        }
+      }
+    }, 15_000);
+    return;
+  }
   if (!confirmResponse.ok) {
     document.getElementById("title").textContent = "Payment not confirmed";
     document.getElementById("message").textContent = order.error || "Try the checkout again.";

@@ -188,7 +188,7 @@ async function confirmPayment(req, res) {
     if (!order) {
       return res.status(404).json({ error: "Order not found." });
     }
-    if (order.status !== "awaiting_payment") {
+    if (!["awaiting_payment", "payment_failed"].includes(order.status)) {
       return res.json(publicOrder(order));
     }
 
@@ -199,12 +199,10 @@ async function confirmPayment(req, res) {
       order.priceGhs
     );
     if (!verification.paid) {
-      const failedOrder = await orders.updateOrderIfStatus(order.id, "awaiting_payment", {
-        status: "payment_failed",
-        payment: verification
+      return res.status(402).json({
+        pending: true,
+        error: "Payment is not confirmed yet. If you have been charged, do not pay again; we will keep checking."
       });
-      if (!failedOrder) return res.json(publicOrder(await orders.getOrder(order.id)));
-      return res.status(402).json({ error: "Payment was not successful." });
     }
 
     let updatedOrder = await orders.claimOrderForProcessing(order.id, verification);
