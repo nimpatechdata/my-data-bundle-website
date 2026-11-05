@@ -74,6 +74,7 @@ router.put("/admin/prices", adminController.requireAdmin, safeRoute(adminControl
 router.put("/admin/password", adminController.requireAdmin, safeRoute(adminController.changePassword));
 router.get("/admin/settings", adminController.requireAdmin, safeRoute(adminController.siteSettings));
 router.put("/admin/settings", adminController.requireAdmin, safeRoute(adminController.updateSiteSettings));
+router.post("/admin/reseller-access", adminController.requireAdmin, safeRoute(adminController.enableAdminReseller));
 router.get("/admin/agent-preview", adminController.requireAdmin, safeRoute(adminController.agentPreview));
 router.get("/admin/analytics", adminController.requireAdmin, safeRoute(analyticsController.getAnalytics));
 router.get("/admin/blog", adminController.requireAdmin, safeRoute(blogController.listAdmin));

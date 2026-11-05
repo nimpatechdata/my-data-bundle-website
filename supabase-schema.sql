@@ -100,6 +100,14 @@ alter table public.agent_profiles
   add column if not exists referred_by uuid references public.agent_profiles(user_id) on delete set null;
 
 alter table public.agent_profiles
+  add column if not exists membership_source text not null default 'payment'
+    check (membership_source in ('payment', 'admin_grant'));
+alter table public.agent_profiles
+  add column if not exists membership_granted_by text;
+alter table public.agent_profiles
+  add column if not exists membership_granted_at timestamptz;
+
+alter table public.agent_profiles
   alter column referral_credits drop default;
 
 create index if not exists agent_profiles_referred_by_idx

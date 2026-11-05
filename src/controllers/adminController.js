@@ -4,6 +4,7 @@ const catalogService = require("../services/catalogService");
 const supabase = require("../services/supabaseClient");
 const receiptService = require("../services/receiptService");
 const agentCatalog = require("../services/agentCatalog");
+const { normalizeGhanaNumber, isValidGhanaMobile } = require("../utils/phone");
 
 const COOKIE_NAME = "nimpatech_admin";
 const SETTINGS_TABLE = "storefront_admin_settings";
@@ -329,8 +330,86 @@ async function agentPreview(_req, res) {
   }
 }
 
+async function findAuthUserByEmail(admin, email) {
+  for (let page = 1; ; page += 1) {
+    const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 1000 });
+    if (error) throw error;
+    const users = data.users || [];
+    const user = users.find((item) => String(item.email || "").toLowerCase() === email);
+    if (user) return user;
+    if (users.length < 1000) return null;
+  }
+}
+
+async function enableAdminReseller(req, res) {
+  const email = String(req.admin?.email || "").trim().toLowerCase();
+  const fullName = String(req.body?.fullName || "").trim();
+  const phone = normalizeGhanaNumber(req.body?.phone);
+  const password = String(req.body?.password || "");
+  if (!email) return res.status(401).json({ error: "Admin login required." });
+  if (!fullName || !isValidGhanaMobile(phone) || password.length < 8) {
+    return res.status(400).json({ error: "Enter your name, a valid Ghana mobile number, and a reseller password of at least 8 characters." });
+  }
+
+  try {
+    const admin = supabase.getAdminClient();
+    const { error: schemaError } = await admin.from("agent_profiles")
+      .select("user_id, membership_status, membership_source, membership_granted_by, membership_granted_at")
+      .limit(1);
+    if (schemaError) throw schemaError;
+
+    let user = await findAuthUserByEmail(admin, email);
+    let profile = null;
+    if (user) {
+      const { data, error } = await admin.from("agent_profiles")
+        .select("membership_status")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (error) throw error;
+      profile = data;
+      if (profile?.membership_status === "suspended") {
+        return res.status(403).json({ error: "This reseller account is suspended. Contact support." });
+      }
+      const { data: updatedUser, error: updateError } = await admin.auth.admin.updateUserById(user.id, {
+        password,
+        email_confirm: true,
+        user_metadata: { ...(user.user_metadata || {}), full_name: fullName, phone }
+      });
+      if (updateError) throw updateError;
+      user = updatedUser.user;
+    } else {
+      const { data, error } = await admin.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+        user_metadata: { full_name: fullName, phone }
+      });
+      if (error) throw error;
+      user = data.user;
+    }
+
+    const grant = {
+      full_name: fullName,
+      phone,
+      membership_status: "active",
+      membership_source: profile?.membership_status === "active" ? undefined : "admin_grant",
+      membership_granted_by: profile?.membership_status === "active" ? undefined : email,
+      membership_granted_at: profile?.membership_status === "active" ? undefined : new Date().toISOString()
+    };
+    const { error: profileError } = profile
+      ? await admin.from("agent_profiles").update(grant).eq("user_id", user.id)
+      : await admin.from("agent_profiles").insert({ user_id: user.id, ...grant });
+    if (profileError) throw profileError;
+
+    return res.json({ enabled: true, email, loginUrl: "/agents.html" });
+  } catch (error) {
+    console.error("Admin reseller access setup failed:", error.message);
+    return res.status(503).json({ error: "Could not enable reseller access. Confirm the latest Supabase schema is applied and try again." });
+  }
+}
+
 function session(req, res) {
   return res.json({ authenticated: true, email: req.admin.email });
 }
 
-module.exports = { login, logout, list, prices, updatePrice, changePassword, forgotPassword, resetPassword, siteSettings, updateSiteSettings, agentPreview, session, requireAdmin };
+module.exports = { login, logout, list, prices, updatePrice, changePassword, forgotPassword, resetPassword, siteSettings, updateSiteSettings, agentPreview, enableAdminReseller, session, requireAdmin };

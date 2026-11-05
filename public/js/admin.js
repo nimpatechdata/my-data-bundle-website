@@ -91,6 +91,33 @@ dashboard.insertBefore(orderFilterPanel, dashboard.querySelector(".admin-table-p
 orderFilterPanel.querySelectorAll("[data-order-filter]").forEach((button) => button.addEventListener("click", () => { activeOrderFilter = button.dataset.orderFilter; orderFilterPanel.querySelectorAll("[data-order-filter]").forEach((item) => item.classList.toggle("active", item === button)); applyOrderFilter(); }));
 new MutationObserver(applyOrderFilter).observe(document.getElementById("orders-body"), { childList: true });
 
+const resellerAccessPanel = document.createElement("div");
+resellerAccessPanel.className = "panel reseller-access-panel";
+resellerAccessPanel.innerHTML = '<h2>Admin reseller access</h2><p class="lead">Create or activate reseller access for your admin email without a membership payment. This grant is recorded separately from paid memberships.</p><form id="admin-reseller-form"><label>Your reseller name<input name="fullName" maxlength="120" required autocomplete="name"></label><label>Your Ghana phone number<input name="phone" inputmode="tel" required autocomplete="tel"></label><label>Reseller portal password<input name="password" type="password" minlength="8" required autocomplete="new-password"></label><p class="error" id="admin-reseller-error" role="status"></p><button class="primary" type="submit">Enable reseller access</button><a id="admin-reseller-login" class="btn btn-ghost" href="/agents.html" hidden>Open reseller login</a></form>';
+dashboard.appendChild(resellerAccessPanel);
+document.getElementById("admin-reseller-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const form = event.target;
+  const message = document.getElementById("admin-reseller-error");
+  const button = form.querySelector('button[type="submit"]');
+  button.disabled = true;
+  message.textContent = "Enabling reseller access...";
+  const response = await fetch("/api/admin/reseller-access", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(Object.fromEntries(new FormData(form)))
+  });
+  const result = await response.json();
+  button.disabled = false;
+  if (!response.ok) {
+    message.textContent = result.error || "Could not enable reseller access.";
+    return;
+  }
+  message.textContent = `Reseller access enabled for ${result.email}. Use the password above to sign in.`;
+  document.getElementById("admin-reseller-login").hidden = false;
+  form.elements.password.value = "";
+});
+
 const settingsPanel = document.createElement("div");
 settingsPanel.className = "panel site-settings-panel";
 settingsPanel.innerHTML = '<h2>Site interface settings</h2><p class="lead">Update the public brand, support contact, and global theme.</p><form id="site-settings-form"><label>Site name<input name="siteName" maxlength="80" required></label><label>Tagline<input name="siteTagline" maxlength="160"></label><label>Homepage description<textarea name="siteDescription" maxlength="300" rows="3"></textarea></label><label>Support phone<input name="supportPhone" inputmode="tel" maxlength="15" required></label><label>WhatsApp number<input name="whatsappNumber" inputmode="tel" maxlength="15" required></label><label>Global theme<select name="theme"><option value="yellow">Yellow + dark blue</option><option value="darkblue">Dark blue</option><option value="white">White</option><option value="black">Black</option></select></label><p class="error" id="settings-error"></p><button class="primary" type="submit">Save interface settings</button></form>';
