@@ -31,13 +31,18 @@
       </div>
 
       <section class="checkout">
-        <form class="panel" id="checkout-form">
+        <form class="panel mtn-picks checkout-bundle-picker" id="checkout-form">
           <div class="checkout-selection">
-          <div class="checkout-section-title">Choose your network</div>
-          <div class="choices network-choices" id="network-choices" aria-live="polite"></div>
-          <div class="bundle-heading" id="bundle-heading" aria-live="polite"></div>
-          <div class="choices" id="bundle-choices"></div>
-          <div class="recipient-details" aria-live="polite">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">DATA BUNDLES</p>
+              <h2>Choose your data bundle</h2>
+              <p class="section-subtitle">Select a network and package, then enter your name and phone number.</p>
+            </div>
+          </div>
+          <div class="home-network-tabs" id="network-choices" role="tablist" aria-label="Choose your network"></div>
+          <div class="mtn-picks__grid" id="bundle-choices" aria-label="Available bundles"></div>
+          <div class="recipient-details" id="recipient-details" aria-live="polite">
             <p class="selection-hint">Selected bundle: <strong id="selected-bundle-label">—</strong></p>
             <label for="buyer-name">Your name</label>
             <input id="buyer-name" name="buyerName" type="text" autocomplete="name" maxlength="90" required />

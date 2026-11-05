@@ -451,6 +451,7 @@ input:focus {
 .mtn-pick { position: relative; display: flex; width: 100%; min-height: 188px; flex-direction: column; overflow: hidden; padding: 20px; border: 1px solid rgba(255,255,255,.12); border-radius: 18px; background: linear-gradient(150deg, rgba(255,255,255,.1), rgba(255,255,255,.035)); color: var(--mod-text); font: inherit; text-align: left; cursor: pointer; transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
 .mtn-pick::after { position: absolute; width: 120px; height: 120px; right: -44px; top: -42px; border-radius: 50%; background: rgba(255, 224, 102, .18); content: ""; }
 .mtn-pick:hover, .mtn-pick:focus-visible { transform: translateY(-4px); border-color: #ffe066; box-shadow: 0 16px 30px rgba(0,0,0,.22); }
+.mtn-pick.is-selected { border-color: #ffe066; box-shadow: 0 0 0 2px rgba(255,224,102,.26), 0 12px 26px rgba(0,0,0,.2); }
 .mtn-pick__label { color: #ffe066; font-size: 11px; font-weight: 800; letter-spacing: .12em; }
 .mtn-pick strong { margin-top: 16px; font-family: "Space Grotesk", sans-serif; font-size: clamp(30px, 3vw, 42px); line-height: 1; }
 .mtn-pick__detail { margin-top: 8px; color: var(--mod-muted); font-size: 13px; }

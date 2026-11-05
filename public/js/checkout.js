@@ -44,10 +44,11 @@ function renderNetworks() {
   state.catalog.networks.forEach((network) => {
     const button = document.createElement("button");
     button.type = "button";
-    button.className = `choice ${network.id} network-${network.id} ${state.network === network.id ? "active" : ""}`;
+    button.className = `home-network-tab network-${network.id} ${state.network === network.id ? "is-active" : ""}`;
     button.dataset.network = network.id;
-    button.setAttribute("aria-pressed", state.network === network.id ? "true" : "false");
-    button.innerHTML = `<strong>${network.name}</strong><small>${network.prefixes.join(", ")}</small>`;
+    button.setAttribute("role", "tab");
+    button.setAttribute("aria-selected", String(state.network === network.id));
+    button.textContent = network.name;
     button.addEventListener("click", () => {
       state.network = network.id;
       const available = state.catalog.bundles[network.id] || [];
@@ -60,111 +61,43 @@ function renderNetworks() {
   });
 }
 
-function renderOldBundles() {
+function renderBundles() {
+  if (!bundleBox) return;
   const network = state.catalog.networks.find((item) => item.id === state.network);
-  const recipientDetails = document.querySelector(".recipient-details");
-  const heading = document.getElementById("bundle-heading");
-  heading.textContent = `2. ${network?.name || "Selected network"} bundles`;
-  heading.className = `bundle-heading network-${state.network}`;
-  heading.dataset.network = state.network;
-  bundleBox.innerHTML = "";
-  state.catalog.bundles[state.network].forEach((bundle) => {
-    const option = document.createElement("div");
-    option.className = `bundle-option ${state.bundleId === bundle.id ? "selected" : ""}`;
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = `bundle ${state.bundleId === bundle.id ? "active" : ""}`;
-    button.innerHTML = `<strong>${bundle.size}</strong><small>GHS ${bundle.priceGhs} · ${bundle.validity}</small>`;
-    button.addEventListener("click", () => {
+  const bundles = state.catalog.bundles[state.network] || [];
+  const picker = document.getElementById("checkout-form");
+  const recipientDetails = document.getElementById("recipient-details");
+  bundleBox.replaceChildren();
+  bundleBox.dataset.network = state.network;
+  picker.dataset.network = state.network;
+  bundles.forEach((bundle) => {
+    const card = document.createElement("button");
+    card.type = "button";
+    const selected = state.bundleId === bundle.id;
+    card.className = `mtn-pick network-${state.network}${selected ? " is-selected" : ""}`;
+    card.setAttribute("aria-pressed", String(selected));
+    card.setAttribute("aria-label", `${selected ? "Selected: " : "Choose "}${network.name} ${bundle.size} for GHS ${Number(bundle.priceGhs).toFixed(2)}`);
+    card.addEventListener("click", () => {
       state.bundleId = bundle.id;
       renderBundles();
       renderSummary();
     });
-    option.appendChild(button);
-    if (state.bundleId === bundle.id) option.appendChild(recipientDetails);
-    bundleBox.appendChild(option);
+
+    const label = document.createElement("span");
+    label.className = "mtn-pick__label";
+    label.textContent = network.name;
+    const size = document.createElement("strong");
+    size.textContent = bundle.size;
+    const price = document.createElement("span");
+    price.className = "mtn-pick__price";
+    price.textContent = `GHS ${Number(bundle.priceGhs).toFixed(2)}`;
+    const cta = document.createElement("span");
+    cta.className = "mtn-pick__cta";
+    cta.textContent = selected ? "Selected bundle ✓" : "Choose this bundle";
+    card.append(label, size, price, cta);
+    bundleBox.appendChild(card);
   });
-}
-
-function renderAllBundles() {
-  const recipientDetails = document.querySelector(".recipient-details");
-  const heading = document.getElementById("bundle-heading");
-  heading.textContent = "2. Choose a bundle by network";
-  heading.className = "bundle-heading";
-  heading.removeAttribute("data-network");
-  bundleBox.innerHTML = "";
-  const networks = [...state.catalog.networks].sort((a, b) => a.id === state.network ? -1 : b.id === state.network ? 1 : 0);
-
-  networks.forEach((network) => {
-    const group = document.createElement("section");
-    group.className = `bundle-network-group bundle-network-group--${network.id} ${network.id === state.network ? "is-selected" : ""}`;
-    group.innerHTML = `<div class="bundle-network-heading"><h3>${network.name} bundles</h3><span>${network.id === state.network ? "Selected network" : `Choose ${network.name}`}</span></div>`;
-    const choices = document.createElement("div");
-    choices.className = "choices bundle-network-choices";
-    (state.catalog.bundles[network.id] || []).forEach((bundle) => {
-      const option = document.createElement("div");
-      option.className = `bundle-option ${state.bundleId === bundle.id ? "selected" : ""}`;
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = `bundle ${state.bundleId === bundle.id ? "active" : ""}`;
-      button.innerHTML = `<strong>${bundle.size}</strong><small>GHS ${bundle.priceGhs} · ${bundle.validity}</small>`;
-      button.addEventListener("click", () => {
-        state.network = network.id;
-        state.bundleId = bundle.id;
-        renderNetworks();
-        renderBundles();
-        renderSummary();
-      });
-      option.appendChild(button);
-      if (state.bundleId === bundle.id) option.appendChild(recipientDetails);
-      choices.appendChild(option);
-    });
-    group.appendChild(choices);
-    bundleBox.appendChild(group);
-  });
-}
-
-function renderBundles() {
-  const recipientDetails = document.querySelector(".recipient-details");
-  const heading = document.getElementById("bundle-heading");
-  if (!heading) return;
-  heading.textContent = "Choose your bundle";
-  heading.className = "bundle-heading";
-  heading.removeAttribute("data-network");
-  if (!bundleBox) return;
-  bundleBox.innerHTML = "";
-
-  const columns = document.createElement("div");
-  columns.className = "network-bundle-columns";
-  state.catalog.networks.forEach((network) => {
-    const column = document.createElement("section");
-    column.className = `network-bundle-column network-bundle-column--${network.id} ${network.id === state.network ? "is-selected" : ""}`;
-    column.innerHTML = `<div class="network-bundle-column__heading"><h3>${network.name}</h3><span>${network.id === state.network ? "Selected" : "Available"}</span></div>`;
-
-    const choices = document.createElement("div");
-    choices.className = "choices network-bundle-column__choices";
-    (state.catalog.bundles[network.id] || []).forEach((bundle) => {
-      const option = document.createElement("div");
-      option.className = `bundle-option ${state.bundleId === bundle.id ? "selected" : ""}`;
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = `bundle ${state.bundleId === bundle.id ? "active" : ""}`;
-      button.innerHTML = `<strong>${bundle.size}</strong><small>GHS ${bundle.priceGhs} · ${bundle.validity}</small>`;
-      button.addEventListener("click", () => {
-        state.network = network.id;
-        state.bundleId = bundle.id;
-        renderNetworks();
-        renderBundles();
-        renderSummary();
-      });
-      option.appendChild(button);
-      if (state.bundleId === bundle.id) option.appendChild(recipientDetails);
-      choices.appendChild(option);
-    });
-    column.appendChild(choices);
-    columns.appendChild(column);
-  });
-  bundleBox.appendChild(columns);
+  recipientDetails.hidden = !state.bundleId;
 }
 
 async function loadCatalog() {
