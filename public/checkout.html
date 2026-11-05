@@ -22,53 +22,39 @@
 
       <p class="kicker">Checkout</p>
       <h1>Buy a data bundle</h1>
-      <p class="lead">Select your network, choose a bundle, and send it to the right phone number in minutes.</p>
+      <p class="lead">Choose a package, then enter your name and phone in the quick purchase form.</p>
 
-      <div class="checkout-progress" aria-label="Checkout progress">
-        <span class="checkout-progress__step is-active">1. Network</span>
-        <span class="checkout-progress__step">2. Bundle</span>
-        <span class="checkout-progress__step">3. Payment</span>
-      </div>
-
-      <section class="checkout">
-        <form class="panel mtn-picks checkout-bundle-picker" id="checkout-form">
-          <div class="checkout-selection">
+      <main class="checkout-direct">
+        <section class="surface mtn-picks checkout-bundle-picker" id="checkout-bundle-picker" aria-labelledby="checkout-bundle-title">
           <div class="section-heading">
             <div>
               <p class="section-kicker">DATA BUNDLES</p>
-              <h2>Choose your data bundle</h2>
-              <p class="section-subtitle">Select a network and package, then enter your name and phone number.</p>
+              <h2 id="checkout-bundle-title">Choose your data bundle</h2>
+              <p class="section-subtitle">Choose a network and package. We will ask for your name and phone before payment.</p>
             </div>
           </div>
           <div class="home-network-tabs" id="network-choices" role="tablist" aria-label="Choose your network"></div>
           <div class="mtn-picks__grid" id="bundle-choices" aria-label="Available bundles"></div>
-          <div class="recipient-details" id="recipient-details" aria-live="polite">
-            <p class="selection-hint">Selected bundle: <strong id="selected-bundle-label">—</strong></p>
-            <label for="buyer-name">Your name</label>
-            <input id="buyer-name" name="buyerName" type="text" autocomplete="name" maxlength="90" required />
+        </section>
+      </main>
 
-            <label for="phone">Phone number for delivery</label>
-            <input id="phone" name="phone" inputmode="tel" autocomplete="tel" placeholder="0241234567" maxlength="13" required aria-describedby="phone-help" />
-            <small class="field-note" id="phone-help">Use a valid Ghana mobile number for instant delivery.</small>
-
-            <p class="error" id="error" aria-live="polite"></p>
-            <button class="primary" type="submit" id="pay-btn">Continue to payment</button>
-          </div>
-          </div>
-        </form>
-
-        <aside class="panel">
-          <h3>Order summary</h3>
-          <div class="summary" style="margin-top: 16px">
-            <div class="row"><span>Network</span><strong id="sum-network">—</strong></div>
-            <div class="row"><span>Bundle</span><strong id="sum-bundle">—</strong></div>
-            <div class="row"><span>Validity</span><strong id="sum-validity">—</strong></div>
-            <div class="row"><span>Phone</span><strong id="sum-phone">—</strong></div>
-            <div class="row"><span>Total</span><strong id="sum-total">GHS 0</strong></div>
-          </div>
-        </aside>
-      </section>
-
+      <dialog class="home-purchase-dialog" id="checkout-purchase-dialog" aria-labelledby="checkout-purchase-title">
+        <div class="home-purchase-dialog__content">
+          <button class="home-purchase-dialog__close" id="checkout-dialog-close" type="button" aria-label="Close">×</button>
+          <p class="section-kicker">QUICK PURCHASE</p>
+          <h2 id="checkout-purchase-title">Your bundle</h2>
+          <p id="checkout-purchase-summary" class="home-purchase-summary"></p>
+          <form class="home-purchase-form" id="checkout-buy-form">
+            <label for="buyer-name">Your name<input id="buyer-name" name="buyerName" type="text" autocomplete="name" maxlength="90" required></label>
+            <label for="phone">Phone number<input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="0241234567" maxlength="13" required></label>
+            <p class="home-purchase-error" id="error" role="alert" aria-live="polite"></p>
+            <div class="home-purchase-form__actions">
+              <button class="home-purchase-form__cancel" id="checkout-dialog-cancel" type="button">Cancel</button>
+              <button class="home-purchase-form__submit" type="submit" id="pay-btn">Continue to secure payment</button>
+            </div>
+          </form>
+        </div>
+      </dialog>
       <footer>Your number is checked against MTN, Telecel and AirtelTigo prefixes.</footer>
     </div>
     <script src="/js/theme.js" defer></script>
