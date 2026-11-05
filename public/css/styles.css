@@ -1350,11 +1350,11 @@ footer {
 
 .support-widget {
   position: fixed;
-  z-index: 20;
-  left: var(--support-left, auto);
-  top: var(--support-top, auto);
-  right: var(--support-right, 22px);
-  bottom: var(--support-bottom, 20px);
+  z-index: 1100;
+  left: auto;
+  top: auto;
+  right: max(22px, env(safe-area-inset-right));
+  bottom: max(20px, env(safe-area-inset-bottom));
   pointer-events: none;
 }
 
@@ -1390,7 +1390,8 @@ footer {
 .support-panel {
   position: absolute;
   z-index: 21;
-  left: 0;
+  right: 0;
+  left: auto;
   bottom: calc(100% + 12px);
   pointer-events: auto;
   width: min(360px, calc(100vw - 28px));
