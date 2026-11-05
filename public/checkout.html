@@ -39,12 +39,12 @@
           <div class="choices" id="bundle-choices"></div>
           <div class="recipient-details" aria-live="polite">
             <p class="selection-hint">Selected bundle: <strong id="selected-bundle-label">—</strong></p>
-            <label for="phone">Recipient phone number</label>
+            <label for="buyer-name">Your name</label>
+            <input id="buyer-name" name="buyerName" type="text" autocomplete="name" maxlength="90" required />
+
+            <label for="phone">Phone number for delivery</label>
             <input id="phone" name="phone" inputmode="tel" autocomplete="tel" placeholder="0241234567" maxlength="13" required aria-describedby="phone-help" />
             <small class="field-note" id="phone-help">Use a valid Ghana mobile number for instant delivery.</small>
-
-            <label for="email">Email for your purchase receipt <span>(optional)</span></label>
-            <input id="email" name="email" type="email" placeholder="you@email.com" autocomplete="email" />
 
             <p class="error" id="error" aria-live="polite"></p>
             <button class="primary" type="submit" id="pay-btn">Continue to payment</button>

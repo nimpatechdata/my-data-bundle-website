@@ -85,7 +85,7 @@ async function run() {
   if (order.receipt?.sent) {
     receiptStatus.textContent = `Emailed to ${order.email}`;
   } else if (!order.email || order.receipt?.status === "email_missing") {
-    receiptStatus.textContent = "No email provided · print this receipt";
+    receiptStatus.textContent = "No email needed; print or track this purchase";
   } else if (order.receipt?.status === "not_configured") {
     receiptStatus.textContent = "Email delivery is not configured";
   } else if (order.receipt?.status === "failed") {
@@ -118,7 +118,7 @@ async function run() {
   const receiptMessage = order.receipt?.sent
     ? `A separate receipt was emailed to ${order.email}.`
     : !order.email
-      ? "No email was provided. Print this page to keep your receipt."
+      ? "Your purchase ID is shown above. Use it to track delivery anytime."
       : "The payment is confirmed, but an email receipt could not be sent. Keep your order reference for support.";
   document.getElementById("message").textContent = `${deliveryMessage} ${receiptMessage}`;
 }

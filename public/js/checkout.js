@@ -10,6 +10,7 @@ const networkBox = document.getElementById("network-choices");
 const bundleBox = document.getElementById("bundle-choices");
 const errorEl = document.getElementById("error");
 const phoneInput = document.getElementById("phone");
+const buyerNameInput = document.getElementById("buyer-name");
 
 function selectedBundle() {
   if (!state.catalog) return null;
@@ -212,7 +213,7 @@ document.getElementById("checkout-form").addEventListener("submit", async (event
         network: state.network,
         bundleId: state.bundleId,
         phone,
-        email: document.getElementById("email").value.trim()
+        buyerName: buyerNameInput.value.trim()
       })
     });
     const data = await response.json();

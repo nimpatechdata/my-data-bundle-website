@@ -61,7 +61,7 @@ function publicOrder(order) {
 
 async function createCheckout(req, res) {
   try {
-    const { network, bundleId, phone, email, buyerName } = req.body || {};
+    const { network, bundleId, phone, buyerName } = req.body || {};
 
     if (!networks[network]) {
       return res.status(400).json({ error: "Choose MTN, Telecel, or AirtelTigo." });
@@ -86,12 +86,10 @@ async function createCheckout(req, res) {
       });
     }
 
-    const receiptEmail = String(email || "").trim().toLowerCase();
-    if (receiptEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(receiptEmail)) {
-      return res.status(400).json({ error: "Enter a valid email address so we can send your receipt." });
-    }
-
     const customerName = String(buyerName || "").trim();
+    if (!customerName) {
+      return res.status(400).json({ error: "Enter your name to continue." });
+    }
     if (customerName.length > 90) {
       return res.status(400).json({ error: "Name must be 90 characters or fewer." });
     }
@@ -106,7 +104,7 @@ async function createCheckout(req, res) {
       priceGhs: bundle.priceGhs,
       phone: normalizedPhone,
       buyerName: customerName || null,
-      email: receiptEmail || null,
+      email: null,
       status: "awaiting_payment",
       payment: null,
       delivery: null,
