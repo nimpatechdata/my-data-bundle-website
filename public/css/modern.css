@@ -448,7 +448,7 @@ input:focus {
 .mtn-picks .section-subtitle { max-width: 560px; margin: 8px 0 0; color: var(--mod-muted); font-size: 15px; line-height: 1.5; }
 .mtn-picks__badge { padding: 8px 12px; border: 1px solid rgba(255, 224, 102, .35); border-radius: 999px; background: rgba(255, 224, 102, .1); color: #ffe066; font-size: 12px; font-weight: 800; white-space: nowrap; }
 .mtn-picks__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
-.mtn-pick { position: relative; display: flex; min-height: 188px; flex-direction: column; overflow: hidden; padding: 20px; border: 1px solid rgba(255,255,255,.12); border-radius: 18px; background: linear-gradient(150deg, rgba(255,255,255,.1), rgba(255,255,255,.035)); color: var(--mod-text); text-decoration: none; transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
+.mtn-pick { position: relative; display: flex; width: 100%; min-height: 188px; flex-direction: column; overflow: hidden; padding: 20px; border: 1px solid rgba(255,255,255,.12); border-radius: 18px; background: linear-gradient(150deg, rgba(255,255,255,.1), rgba(255,255,255,.035)); color: var(--mod-text); font: inherit; text-align: left; cursor: pointer; transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
 .mtn-pick::after { position: absolute; width: 120px; height: 120px; right: -44px; top: -42px; border-radius: 50%; background: rgba(255, 224, 102, .18); content: ""; }
 .mtn-pick:hover, .mtn-pick:focus-visible { transform: translateY(-4px); border-color: #ffe066; box-shadow: 0 16px 30px rgba(0,0,0,.22); }
 .mtn-pick__label { color: #ffe066; font-size: 11px; font-weight: 800; letter-spacing: .12em; }
@@ -460,6 +460,22 @@ input:focus {
 .mtn-pick--popular { border-color: rgba(255, 224, 102, .55); background: linear-gradient(150deg, rgba(255,224,102,.18), rgba(255,255,255,.045)); }
 .mtn-pick--power::after { background: rgba(112, 216, 255, .16); }
 .mtn-pick--max::after { background: rgba(98, 227, 156, .16); }
+.home-purchase-dialog { width: min(440px, calc(100% - 28px)); padding: 0; border: 1px solid rgba(255,255,255,.16); border-radius: 22px; background: #111a2b; color: #f7f8fb; box-shadow: 0 24px 80px rgba(0,0,0,.45); }
+.home-purchase-dialog::backdrop { background: rgba(4,9,18,.72); backdrop-filter: blur(5px); }
+.home-purchase-dialog__content { position: relative; padding: 28px; }
+.home-purchase-dialog__content h2 { margin: 4px 0 8px; font-family: "Space Grotesk", sans-serif; }
+.home-purchase-dialog__close { position: absolute; top: 16px; right: 18px; width: 38px; height: 38px; border: 1px solid rgba(255,255,255,.14); border-radius: 50%; background: transparent; color: inherit; font-size: 22px; cursor: pointer; }
+.home-purchase-summary { margin: 16px 0 20px; padding: 13px 15px; border-radius: 12px; background: rgba(255,224,102,.1); color: #ffe066; font-weight: 800; }
+.home-purchase-form { display: grid; gap: 13px; }
+.home-purchase-form label { display: grid; gap: 7px; color: #d5d9e3; font-size: 13px; font-weight: 700; }
+.home-purchase-form input { width: 100%; min-height: 48px; padding: 11px 13px; border: 1px solid rgba(255,255,255,.18); border-radius: 11px; background: rgba(255,255,255,.06); color: #fff; font: inherit; }
+.home-purchase-form input:focus { outline: 2px solid #ffe066; outline-offset: 2px; }
+.home-purchase-form__actions { display: flex; gap: 10px; margin-top: 7px; }
+.home-purchase-form__actions button { flex: 1; min-height: 46px; border: 0; border-radius: 11px; font: inherit; font-weight: 800; cursor: pointer; }
+.home-purchase-form__cancel { background: rgba(255,255,255,.1); color: #fff; }
+.home-purchase-form__submit { background: #ffe066; color: #171717; }
+.home-purchase-form__submit:disabled { opacity: .65; cursor: wait; }
+.home-purchase-error { min-height: 20px; margin: 0; color: #ff9b9b; font-size: 13px; }
 .bundle-network-group { margin-top: 22px; padding: 16px; border: 1px solid rgba(255,255,255,.09); border-radius: 16px; background: rgba(255,255,255,.025); }
 .bundle-network-group.is-selected { border-color: rgba(255,224,102,.45); background: rgba(255,224,102,.055); }
 .bundle-network-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }

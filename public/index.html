@@ -77,7 +77,7 @@
           <div>
             <p class="section-kicker">DATA BUNDLES</p>
           <h1 id="mtn-picks-title">Choose your data bundle</h1>
-            <p class="section-subtitle">Pick a network, choose a package, and continue straight to checkout.</p>
+            <p class="section-subtitle">Choose a bundle, enter your name and phone number, then pay securely.</p>
           </div>
           <span class="mtn-picks__badge">All networks</span>
         </div>
@@ -113,6 +113,24 @@
           </a>
         </div>
       </section>
+
+      <dialog class="home-purchase-dialog" id="home-purchase-dialog" aria-labelledby="home-purchase-title">
+        <div class="home-purchase-dialog__content">
+          <button class="home-purchase-dialog__close" type="button" aria-label="Close" onclick="document.getElementById('home-purchase-dialog').close()">×</button>
+          <p class="section-kicker">QUICK PURCHASE</p>
+          <h2 id="home-purchase-title">Your bundle</h2>
+          <p id="home-purchase-summary" class="home-purchase-summary"></p>
+          <form class="home-purchase-form" id="home-purchase-form">
+            <label for="home-buyer-name">Your name<input id="home-buyer-name" name="buyerName" type="text" autocomplete="name" maxlength="90" required></label>
+            <label for="home-buyer-phone">Phone number<input id="home-buyer-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="0241234567" maxlength="13" required></label>
+            <p class="home-purchase-error" id="home-purchase-error" role="alert" aria-live="polite"></p>
+            <div class="home-purchase-form__actions">
+              <button class="home-purchase-form__cancel" type="button" onclick="document.getElementById('home-purchase-dialog').close()">Cancel</button>
+              <button class="home-purchase-form__submit" id="home-purchase-submit" type="submit">Continue to secure payment</button>
+            </div>
+          </form>
+        </div>
+      </dialog>
 
       <details class="homepage-more" id="homepage-more">
         <summary>More</summary>
