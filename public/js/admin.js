@@ -7,7 +7,7 @@ const dashboardError = document.getElementById("dashboard-error");
 const logout = document.getElementById("logout");
 const statusLabels = { awaiting_payment: "Attempted · unpaid", payment_failed: "Payment failed", processing: "Processing", paid_awaiting_delivery: "Awaiting delivery", delivered: "Delivered", delivery_failed: "Delivery failed", delivery_review: "Needs review", demo_pending: "Demo" };
 
-function showDashboard() { loginPanel.hidden = true; dashboard.hidden = false; logout.hidden = false; if ("Notification" in window && Notification.permission === "default") Notification.requestPermission(); loadOrders(); loadPrices(); loadSiteSettings().catch((error) => { document.getElementById("settings-error").textContent = error.message; }); }
+function showDashboard() { loginPanel.hidden = true; dashboard.hidden = false; logout.hidden = false; if (!document.getElementById("agent-preview-link")) { const link = document.createElement("a"); link.id = "agent-preview-link"; link.className = "btn btn-ghost"; link.href = "/agents/dashboard?preview=1"; link.textContent = "Preview sub-agent store"; document.querySelector(".admin-overview").append(link); } if ("Notification" in window && Notification.permission === "default") Notification.requestPermission(); loadOrders(); loadPrices(); loadSiteSettings().catch((error) => { document.getElementById("settings-error").textContent = error.message; }); }
 async function loadOrders() {
   dashboardError.textContent = "Loading…";
   const response = await fetch("/api/admin/activity");
@@ -98,3 +98,4 @@ dashboard.appendChild(settingsPanel);
 async function loadSiteSettings() { const response = await fetch("/api/admin/settings"); const data = await response.json(); if (!response.ok) throw new Error(data.error || "Could not load site settings."); const form = document.getElementById("site-settings-form"); Object.entries(data).forEach(([key, value]) => { if (form.elements[key]) form.elements[key].value = value; }); }
 loadSiteSettings().catch((error) => { document.getElementById("settings-error").textContent = error.message; });
 document.getElementById("site-settings-form").addEventListener("submit", async (event) => { event.preventDefault(); const form = event.target; const response = await fetch("/api/admin/settings", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(Object.fromEntries(new FormData(form))) }); const data = await response.json(); document.getElementById("settings-error").textContent = response.ok ? "Interface settings saved." : data.error || "Could not save settings."; });
+fetch("/api/admin/session").then((response) => { if (response.ok && !resetToken) showDashboard(); }).catch(() => {});

@@ -1,4 +1,5 @@
 const accessToken = sessionStorage.getItem("nimpatech-agent-token");
+const previewMode = new URLSearchParams(window.location.search).get("preview") === "1";
 const dashboardMessage = document.getElementById("agent-dashboard-message");
 const productGrid = document.getElementById("agent-product-grid");
 const priceFormatter = new Intl.NumberFormat("en-GH", { style: "currency", currency: "GHS", maximumFractionDigits: 2 });
@@ -317,11 +318,38 @@ document.querySelector(".agent-dashboard-nav").addEventListener("click", (event)
 });
 
 document.getElementById("agent-signout").addEventListener("click", () => {
+  if (previewMode) {
+    window.location.assign("/admin");
+    return;
+  }
   sessionStorage.removeItem("nimpatech-agent-token");
   window.location.assign("/agents.html");
 });
 
 async function loadAgentDashboard() {
+  if (previewMode) {
+    try {
+      const response = await fetch("/api/admin/agent-preview");
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "Admin sign-in is required to preview the sub-agent store.");
+      const banner = document.createElement("aside");
+      banner.className = "agent-preview-banner";
+      banner.textContent = "Admin preview · sample data only. Store actions are disabled and no orders or price changes will be saved.";
+      document.querySelector(".agent-dashboard-shell").prepend(banner);
+      document.getElementById("agent-name-display").textContent = "Admin preview";
+      document.getElementById("agent-signout").textContent = "Back to admin";
+      renderDashboard(data);
+      document.getElementById("agent-signout").textContent = "Back to admin";
+      document.getElementById("reseller-invite-link").type = "text";
+      document.getElementById("copy-reseller-invite").disabled = true;
+      document.getElementById("reseller-invite-message").textContent = "Sample count and link. Real referrals appear after an agent account is active.";
+      document.querySelectorAll("#agent-product-grid input, #agent-product-grid button").forEach((control) => { control.disabled = true; });
+      document.getElementById("sale-dialog").remove();
+    } catch (error) {
+      window.location.replace(`/admin?previewError=${encodeURIComponent(error.message)}`);
+    }
+    return;
+  }
   if (!accessToken) {
     window.location.replace("/agents.html#login");
     return;

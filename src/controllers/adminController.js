@@ -3,6 +3,7 @@ const orders = require("../store/orders");
 const catalogService = require("../services/catalogService");
 const supabase = require("../services/supabaseClient");
 const receiptService = require("../services/receiptService");
+const agentCatalog = require("../services/agentCatalog");
 
 const COOKIE_NAME = "nimpatech_admin";
 const SETTINGS_TABLE = "storefront_admin_settings";
@@ -288,4 +289,48 @@ async function updateSiteSettings(req, res) {
   return res.json(next);
 }
 
-module.exports = { login, logout, list, prices, updatePrice, changePassword, forgotPassword, resetPassword, siteSettings, updateSiteSettings, requireAdmin };
+async function agentPreview(_req, res) {
+  try {
+    const catalog = (await agentCatalog.getAgentCatalog()).map((item) => ({
+      ...item,
+      salePrice: Number((Number(item.basePrice) + 5).toFixed(2))
+    }));
+    const now = new Date().toISOString();
+    const firstBundle = catalog[0];
+    const orders = firstBundle ? [{
+      id: "PREVIEW-ORDER-01",
+      network: firstBundle.network,
+      size_gb: firstBundle.sizeGb,
+      phone: "024•••••67",
+      sale_price: firstBundle.salePrice,
+      profit_amount: firstBundle.salePrice - Number(firstBundle.basePrice),
+      status: "delivered",
+      created_at: now
+    }] : [];
+    return res.json({
+      preview: true,
+      profile: { full_name: "Preview Agent", wallet_balance: 24.5 },
+      catalog,
+      orders,
+      walletEntries: orders.map((order) => ({
+        id: "PREVIEW-WALLET-01",
+        order_id: order.id,
+        amount: order.profit_amount,
+        entry_type: "sale_profit",
+        created_at: now
+      })),
+      resellerCount: 3,
+      referralsEnabled: true,
+      resellerInviteUrl: "Preview only — real invitation links appear in an active agent account"
+    });
+  } catch (error) {
+    console.error("Agent preview could not load:", error.message);
+    return res.status(503).json({ error: "Could not load the sub-agent store preview." });
+  }
+}
+
+function session(req, res) {
+  return res.json({ authenticated: true, email: req.admin.email });
+}
+
+module.exports = { login, logout, list, prices, updatePrice, changePassword, forgotPassword, resetPassword, siteSettings, updateSiteSettings, agentPreview, session, requireAdmin };

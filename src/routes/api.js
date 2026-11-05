@@ -49,6 +49,7 @@ router.post("/webhooks/payment", webhookController.handlePaymentWebhook);
 router.post("/webhooks/vtu", webhookController.handleVtuWebhook);
 
 router.post("/admin/login", adminController.login);
+router.get("/admin/session", adminController.requireAdmin, adminController.session);
 router.post("/admin/forgot-password", adminController.forgotPassword);
 router.post("/admin/reset-password", adminController.resetPassword);
 router.post("/admin/logout", adminController.logout);
@@ -59,6 +60,7 @@ router.put("/admin/prices", adminController.requireAdmin, adminController.update
 router.put("/admin/password", adminController.requireAdmin, adminController.changePassword);
 router.get("/admin/settings", adminController.requireAdmin, adminController.siteSettings);
 router.put("/admin/settings", adminController.requireAdmin, adminController.updateSiteSettings);
+router.get("/admin/agent-preview", adminController.requireAdmin, adminController.agentPreview);
 router.get("/admin/analytics", adminController.requireAdmin, analyticsController.getAnalytics);
 router.get("/admin/blog", adminController.requireAdmin, blogController.listAdmin);
 router.post("/admin/blog", adminController.requireAdmin, blogController.create);

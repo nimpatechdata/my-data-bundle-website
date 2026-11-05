@@ -214,6 +214,7 @@
 }
 
 .agent-referral-card { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(260px, .8fr); align-items: center; gap: 22px; margin: 18px 0; padding: 22px; border: 1px solid rgba(42, 110, 190, .16); border-radius: 16px; background: linear-gradient(125deg, #fff, #f3f8ff); box-shadow: 0 8px 25px rgba(20, 54, 100, .06); }
+.agent-preview-banner { margin: 0 0 16px; padding: 13px 16px; border: 1px solid #d6a72c; border-radius: 12px; background: #fff8dc; color: #624b08; font-size: 13px; font-weight: 700; line-height: 1.5; }
 .agent-referral-card h2 { margin: 0; color: var(--agent-ink); font-size: 22px; }
 .agent-referral-card p:not(.agent-eyebrow) { max-width: 520px; margin: 8px 0; color: var(--agent-muted); font-size: 13px; line-height: 1.5; }
 .agent-referral-count { display: inline-block; margin-top: 5px; color: #176d45; font-size: 13px; }
