@@ -2,8 +2,10 @@ const assert = require("node:assert/strict");
 const { after, test } = require("node:test");
 
 const supabase = require("../services/supabaseClient");
+const orders = require("../store/orders");
 const originalGetAdminClient = supabase.getAdminClient;
-const { enableAdminReseller } = require("./adminController");
+const originalListOrders = orders.listOrders;
+const { enableAdminReseller, list } = require("./adminController");
 
 let profileRow;
 let authUsers;
@@ -61,6 +63,25 @@ function response() {
 
 after(() => {
   supabase.getAdminClient = originalGetAdminClient;
+  orders.listOrders = originalListOrders;
+});
+
+test("admin activity includes the buyer name captured during checkout", async () => {
+  orders.listOrders = async () => [{
+    id: "order-1",
+    buyerName: "Ama Mensah",
+    email: "ama@example.com",
+    phone: "0241234567",
+    network: "mtn",
+    size: "1GB",
+    priceGhs: 5,
+    status: "awaiting_payment"
+  }];
+  const res = response();
+
+  await list({}, res);
+
+  assert.equal(res.body.orders[0].customerName, "Ama Mensah");
 });
 
 test("admin can provision reseller access with an audited complimentary grant", async () => {

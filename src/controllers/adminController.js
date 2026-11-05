@@ -224,6 +224,7 @@ async function list(req, res) {
       network: order.networkName || order.network,
       size: order.size,
       phone: order.phone,
+      customerName: order.buyerName || order.customerName || null,
       email: order.email,
       priceGhs: order.priceGhs,
       status: order.status,
