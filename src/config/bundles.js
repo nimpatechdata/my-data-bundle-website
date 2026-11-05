@@ -16,7 +16,6 @@ const bundles = {
     { id: "mtn-50gb", size: "50GB", validity: "3 months", priceGhs: 220 }
   ],
   telecel: [
-    { id: "tel-5gb", size: "5GB", validity: "3 months", priceGhs: 25 },
     { id: "tel-10gb", size: "10GB", validity: "3 months", priceGhs: 45 },
     { id: "tel-15gb", size: "15GB", validity: "3 months", priceGhs: 64 },
     { id: "tel-20gb", size: "20GB", validity: "3 months", priceGhs: 79 },
