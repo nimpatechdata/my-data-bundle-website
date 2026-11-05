@@ -2,14 +2,23 @@ const lookupForm = document.getElementById("order-lookup-form");
 const lookupMessage = document.getElementById("order-lookup-message");
 const lookupResult = document.getElementById("order-lookup-result");
 let refreshTimer = null;
-function deliveryTime(order) {
-  const started = new Date(order.delivery?.startedAt || order.createdAt || order.updatedAt).getTime();
-  const finished = order.delivery?.deliveredAt ? new Date(order.delivery.deliveredAt).getTime() : Date.now();
+let displayTimer = null;
+let trackedOrder = null;
+function formatElapsed(startedAt, finishedAt = Date.now()) {
+  const started = new Date(startedAt).getTime();
   if (!Number.isFinite(started)) return "—";
-  const seconds = Math.max(0, Math.floor((finished - started) / 1000));
-  return order.status === "delivered" ? `Delivered in ${Math.floor(seconds / 60)}m ${seconds % 60}s` : `In progress · ${Math.floor(seconds / 60)}m ${seconds % 60}s`;
+  const seconds = Math.max(0, Math.floor((finishedAt - started) / 1000));
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = seconds % 60;
+  return `${String(hours).padStart(2, "0")}h ${String(minutes).padStart(2, "0")}m ${String(remainingSeconds).padStart(2, "0")}s`;
+}
+function formatDeliveryTimeExact(order) {
+  const elapsed = formatElapsed(order.delivery?.startedAt || order.createdAt || order.updatedAt, order.delivery?.deliveredAt ? new Date(order.delivery.deliveredAt).getTime() : Date.now());
+  return order.status === "delivered" ? `Delivered in ${elapsed}` : `In progress · ${elapsed}`;
 }
 function renderTrackedOrder(order) {
+  trackedOrder = order;
   document.getElementById("lookup-status").textContent = statusLabels[order.status] || "Processing";
   const initialNetwork = document.getElementById("lookup-network");
   initialNetwork.textContent = order.networkName || order.network || "—";
@@ -17,7 +26,7 @@ function renderTrackedOrder(order) {
   document.getElementById("lookup-bundle").textContent = `${order.size || "—"}${order.validity ? ` · ${order.validity}` : ""}`;
   document.getElementById("lookup-phone").textContent = order.phone || "—";
   document.getElementById("lookup-amount").textContent = `GHS ${Number(order.priceGhs || 0).toFixed(2)}`;
-  document.getElementById("lookup-delivery-time").textContent = deliveryTime(order);
+  document.getElementById("lookup-delivery-time").textContent = formatDeliveryTimeExact(order);
   document.getElementById("lookup-delivery-message").textContent = order.delivery?.message || "";
 }
 
@@ -61,6 +70,8 @@ lookupForm.addEventListener("submit", async (event) => {
     lookupResult.hidden = false;
     renderTrackedOrder(result);
     clearInterval(refreshTimer);
+    clearInterval(displayTimer);
+    displayTimer = setInterval(() => { if (trackedOrder) renderTrackedOrder(trackedOrder); }, 1000);
     refreshTimer = setInterval(async () => {
       const latestResponse = await fetch(`/api/orders/${encodeURIComponent(reference)}`, { headers: { Accept: "application/json" } });
       if (latestResponse.ok) renderTrackedOrder(await latestResponse.json());

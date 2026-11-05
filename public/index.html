@@ -75,13 +75,14 @@
       <section class="surface mtn-picks" aria-labelledby="mtn-picks-title">
         <div class="section-heading">
           <div>
-            <p class="section-kicker">POPULAR MTN PICKS</p>
-            <h2 id="mtn-picks-title">Choose your perfect bundle</h2>
-            <p class="section-subtitle">Reliable MTN data for streaming, work, social media, and everyday connection.</p>
+            <p class="section-kicker">DATA BUNDLES</p>
+          <h1 id="mtn-picks-title">Choose your data bundle</h1>
+            <p class="section-subtitle">Pick a network, choose a package, and continue straight to checkout.</p>
           </div>
-          <span class="mtn-picks__badge">Unlimited bundles</span>
+          <span class="mtn-picks__badge">All networks</span>
         </div>
-        <div class="mtn-picks__grid">
+        <div class="home-network-tabs" id="home-network-tabs" role="tablist" aria-label="Choose your network"></div>
+        <div class="mtn-picks__grid" id="home-bundle-grid">
           <a class="mtn-pick mtn-pick--starter" data-bundle="mtn-1gb" href="/checkout.html?network=mtn&bundle=mtn-1gb">
             <span class="mtn-pick__label">STARTER</span>
             <strong>1GB</strong>
@@ -113,6 +114,9 @@
         </div>
       </section>
 
+      <details class="homepage-more" id="homepage-more">
+        <summary>More</summary>
+        <div class="homepage-more__content">
       <ul class="trust-strip" aria-label="Why customers trust NImpatech">
         <li><svg class="trust-icon--secure" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-2.9 7.7-7 9-4.1-1.3-7-4.6-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg> Secure payments</li>
         <li><svg class="trust-icon--instant" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4.5 13.5H11l-1 8.5L18.5 10H12z"/></svg> Instant delivery</li>
@@ -253,11 +257,14 @@
       </section>
 
       <footer class="site-footer"></footer>
+        </div>
+      </details>
     </main>
     <script src="/js/theme.js" defer></script>
     <script src="/js/site-updates.js" defer></script>
     <script src="/js/blog.js" defer></script>
     <script src="/js/mtn-picks.js" defer></script>
+    <script src="/js/order-activity.js" defer></script>
     <script src="/js/site-chrome.js" defer></script>
     <script src="/js/support-widget.js" defer></script>
   </body>

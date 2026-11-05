@@ -182,6 +182,7 @@ async function refreshOrders(admin, agentId, orders) {
 
 const enroll = safeHandler(async (req, res) => {
   const { fullName, email, phone, password } = req.body || {};
+  const referrerId = String(req.body?.referrerId || "").trim();
   if (!String(fullName || "").trim() || !email || !phone || String(password || "").length < 8) {
     throw httpError("Enter your name, email, phone number, and a password of at least 8 characters.", 400);
   }
@@ -191,6 +192,18 @@ const enroll = safeHandler(async (req, res) => {
   if (!isValidGhanaMobile(normalizedPhone)) throw httpError("Enter a valid Ghana mobile number.", 400);
 
   const admin = supabase.getAdminClient();
+  if (referrerId) {
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(referrerId)) {
+      throw httpError("This reseller invitation link is invalid.", 400);
+    }
+    const { data: referrer, error: referrerError } = await admin.from("agent_profiles")
+      .select("user_id")
+      .eq("user_id", referrerId)
+      .eq("membership_status", "active")
+      .maybeSingle();
+    if (referrerError) throw referrerError;
+    if (!referrer) throw httpError("This reseller invitation is no longer active.", 400);
+  }
   const { data: userData, error: userError } = await admin.auth.admin.createUser({
     email: String(email).trim().toLowerCase(),
     password,
@@ -199,13 +212,14 @@ const enroll = safeHandler(async (req, res) => {
   });
   if (userError) throw httpError(userError.message, 400);
 
-  const { error: profileError } = await admin.from("agent_profiles").insert({
+  const profileRecord = {
     user_id: userData.user.id,
     full_name: String(fullName).trim(),
     phone: normalizedPhone,
-    membership_status: "pending",
-    referral_credits: 5
-  });
+    membership_status: "pending"
+  };
+  if (referrerId) profileRecord.referred_by = referrerId;
+  const { error: profileError } = await admin.from("agent_profiles").insert(profileRecord);
   if (profileError) throw httpError("Could not create agent profile.", 500);
 
   const { authorization_url } = await paymentService.initializeMembership(userData.user.id, email, normalizedPhone);
@@ -341,7 +355,14 @@ const getDashboard = safeHandler(async (req, res) => {
     .single();
   if (profileError) throw profileError;
 
-  res.json({ profile: refreshedProfile || profile, catalog, orders, walletEntries: ledger || [] });
+  const { count: resellerCount, error: resellerError } = await admin.from("agent_profiles")
+    .select("user_id", { count: "exact", head: true })
+    .eq("referred_by", user.id)
+    .eq("membership_status", "active");
+  const referralsEnabled = !resellerError;
+  if (resellerError && resellerError.code !== "42703" && !String(resellerError.message || "").includes("referred_by")) throw resellerError;
+  const siteUrl = String(process.env.PUBLIC_SITE_URL || "https://nimpatechdata.com").replace(/\/$/, "");
+  res.json({ profile: refreshedProfile || profile, catalog, orders, walletEntries: ledger || [], resellerCount: resellerCount || 0, referralsEnabled, resellerInviteUrl: `${siteUrl}/agents.html?ref=${encodeURIComponent(user.id)}` });
 }, "Could not load the agent dashboard.");
 
 const savePrice = safeHandler(async (req, res) => {

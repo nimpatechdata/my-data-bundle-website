@@ -36,6 +36,21 @@
         <article><span>Profit earned</span><strong id="agent-profit-today">GHS 0.00</strong></article>
       </section>
 
+      <section class="agent-referral-card" aria-labelledby="reseller-invite-title">
+        <div>
+          <p class="agent-eyebrow">GROW YOUR RESELLER NETWORK</p>
+          <h2 id="reseller-invite-title">Invite unlimited resellers</h2>
+          <p>Share your personal registration link. There is no limit to the number of active resellers you can invite.</p>
+          <strong class="agent-referral-count"><span id="reseller-count">0</span> active resellers</strong>
+        </div>
+        <div class="agent-referral-share">
+          <label for="reseller-invite-link">Your invitation link</label>
+          <input id="reseller-invite-link" type="url" readonly />
+          <button class="agent-primary-button" id="copy-reseller-invite" type="button">Copy invitation link</button>
+          <small id="reseller-invite-message" role="status"></small>
+        </div>
+      </section>
+
       <nav class="agent-view-tabs" aria-label="Agent workspace views">
         <button class="is-active" type="button" data-view="store">My store</button>
         <button type="button" data-view="orders">Order tracker</button>

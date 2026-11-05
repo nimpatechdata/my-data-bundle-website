@@ -10,8 +10,13 @@ function renderDeliveryTime(order) {
   const element = document.getElementById("delivery-time");
   if (!element || !Number.isFinite(started)) return;
   const seconds = Math.max(0, Math.floor((finished - started) / 1000));
-  element.textContent = order.status === "delivered" ? `Delivered in ${Math.floor(seconds / 60)}m ${seconds % 60}s` : `In progress · ${Math.floor(seconds / 60)}m ${seconds % 60}s`;
+  const elapsed = `${String(Math.floor(seconds / 3600)).padStart(2, "0")}h ${String(Math.floor((seconds % 3600) / 60)).padStart(2, "0")}m ${String(seconds % 60).padStart(2, "0")}s`;
+  element.textContent = order.status === "delivered" ? `Delivered in ${elapsed}` : `In progress · ${elapsed}`;
 }
+
+window.setInterval(() => {
+  if (latestOrder) renderDeliveryTime(latestOrder);
+}, 1000);
 
 async function run() {
   if (!orderId) {

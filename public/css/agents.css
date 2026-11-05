@@ -212,3 +212,14 @@
   .agent-dashboard-page .agent-name { max-width: 66px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .agent-dashboard-page .agent-signout { flex: 0 0 auto; }
 }
+
+.agent-referral-card { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(260px, .8fr); align-items: center; gap: 22px; margin: 18px 0; padding: 22px; border: 1px solid rgba(42, 110, 190, .16); border-radius: 16px; background: linear-gradient(125deg, #fff, #f3f8ff); box-shadow: 0 8px 25px rgba(20, 54, 100, .06); }
+.agent-referral-card h2 { margin: 0; color: var(--agent-ink); font-size: 22px; }
+.agent-referral-card p:not(.agent-eyebrow) { max-width: 520px; margin: 8px 0; color: var(--agent-muted); font-size: 13px; line-height: 1.5; }
+.agent-referral-count { display: inline-block; margin-top: 5px; color: #176d45; font-size: 13px; }
+.agent-referral-count span { margin-right: 3px; font-size: 20px; }
+.agent-referral-share { display: grid; gap: 8px; }
+.agent-referral-share label { margin: 0; color: var(--agent-muted); font-size: 12px; font-weight: 700; }
+.agent-referral-share input { width: 100%; min-width: 0; min-height: 42px; padding: 10px 12px; border: 1px solid var(--agent-line); border-radius: 9px; background: #fff; color: var(--agent-ink); font-size: 12px; }
+.agent-referral-share small { min-height: 16px; color: #176d45; font-size: 11px; }
+@media (max-width: 680px) { .agent-referral-card { grid-template-columns: 1fr; gap: 14px; padding: 17px; } }

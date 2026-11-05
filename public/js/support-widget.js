@@ -38,7 +38,8 @@ supportRoot.innerHTML = `
       <p class="support-note">Quick answers are automated prompts. The contact form opens WhatsApp with a draft; nothing is sent until you choose to send it.</p>
     </div>
   </section>`;
-document.body.appendChild(supportRoot);
+const homepageMoreContent = window.location.pathname === "/" ? document.querySelector(".homepage-more__content") : null;
+(homepageMoreContent || document.body).appendChild(supportRoot);
 
 fetch("/api/site-settings").then((response) => response.ok ? response.json() : null).then((settings) => {
   if (!settings) return;

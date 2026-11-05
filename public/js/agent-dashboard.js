@@ -243,12 +243,29 @@ function renderDashboard(data) {
   document.getElementById("agent-orders-today").textContent = String(todaysOrders.length);
   document.getElementById("agent-sales-today").textContent = money(salesToday.reduce((total, order) => total + Number(order.sale_price || 0), 0));
   document.getElementById("agent-profit-today").textContent = money(profitToday);
+  document.getElementById("reseller-count").textContent = String(data.resellerCount || 0);
+  document.getElementById("reseller-invite-link").value = data.resellerInviteUrl || "";
+  const copyInviteButton = document.getElementById("copy-reseller-invite");
+  copyInviteButton.disabled = !data.referralsEnabled;
+  document.getElementById("reseller-invite-message").textContent = data.referralsEnabled ? "" : "Reseller invitations will be ready after the database update is applied.";
   renderNetworkTabs();
   if (state.catalog.length) renderProducts();
   else productGrid.innerHTML = '<p class="agent-loading">No bundles are available right now.</p>';
   renderOrders();
   renderLedger();
 }
+
+document.getElementById("copy-reseller-invite").addEventListener("click", async () => {
+  const input = document.getElementById("reseller-invite-link");
+  const message = document.getElementById("reseller-invite-message");
+  try {
+    await navigator.clipboard.writeText(input.value);
+    message.textContent = "Invitation link copied. Share it with as many resellers as you like.";
+  } catch {
+    input.select();
+    message.textContent = "Select and copy your invitation link to share it.";
+  }
+});
 
 document.getElementById("sale-price").addEventListener("input", updateSalePreview);
 document.getElementById("sale-dialog-close").addEventListener("click", () => document.getElementById("sale-dialog").close());

@@ -41,7 +41,8 @@ function customerDeliveryTime(order) {
   const finished = order.delivery?.deliveredAt ? new Date(order.delivery.deliveredAt).getTime() : Date.now();
   if (!Number.isFinite(started)) return "—";
   const seconds = Math.max(0, Math.floor((finished - started) / 1000));
-  return order.status === "delivered" ? `Delivered in ${Math.floor(seconds / 60)}m ${seconds % 60}s` : `In progress · ${Math.floor(seconds / 60)}m ${seconds % 60}s`;
+  const elapsed = `${String(Math.floor(seconds / 3600)).padStart(2, "0")}h ${String(Math.floor((seconds % 3600) / 60)).padStart(2, "0")}m ${String(seconds % 60).padStart(2, "0")}s`;
+  return order.status === "delivered" ? `Delivered in ${elapsed}` : `In progress · ${elapsed}`;
 }
 function renderCustomerOrders() {
   const target = document.getElementById("customer-orders-list");

@@ -13,6 +13,10 @@
 
   const menuToggle = document.getElementById("menu-toggle");
   const headerActions = menuToggle?.closest(".header-actions");
+  if (menuToggle && window.location.pathname === "/") {
+    menuToggle.textContent = "More";
+    menuToggle.setAttribute("aria-label", "Show more site options");
+  }
   if (!menuToggle || !headerActions) {
     const backButton = document.createElement("button");
     backButton.className = "site-back-button";
@@ -32,6 +36,7 @@
   if (dashboardNav) {
     dashboardNav.querySelectorAll("a").forEach((link) => {
       link.addEventListener("click", () => {
+        if (link.hash === "#homepage-more") document.getElementById("homepage-more")?.setAttribute("open", "");
         dashboardNav.classList.remove("is-open");
         if (menuToggle) menuToggle.setAttribute("aria-expanded", "false");
       });
@@ -62,8 +67,15 @@
     menuToggle.addEventListener("click", () => {
       const open = dashboardNav.classList.toggle("is-open");
       menuToggle.setAttribute("aria-expanded", String(open));
+      if (window.location.pathname === "/") menuToggle.textContent = open ? "Close" : "More";
     });
   }
+
+  const homepageMore = document.getElementById("homepage-more");
+  homepageMore?.addEventListener("toggle", () => {
+    const summary = homepageMore.querySelector("summary");
+    if (summary) summary.textContent = homepageMore.open ? "Less" : "More";
+  });
 
   const year = new Date().getFullYear();
   const existingFooter = document.querySelector("footer");

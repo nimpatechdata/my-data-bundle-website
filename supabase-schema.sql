@@ -92,9 +92,18 @@ create table if not exists public.agent_profiles (
   membership_status text not null default 'pending'
     check (membership_status in ('pending', 'active', 'suspended')),
   wallet_balance numeric(12, 2) not null default 0 check (wallet_balance >= 0),
-  referral_credits integer default 5,
+  referral_credits integer default null,
   created_at timestamptz not null default now()
 );
+
+alter table public.agent_profiles
+  add column if not exists referred_by uuid references public.agent_profiles(user_id) on delete set null;
+
+alter table public.agent_profiles
+  alter column referral_credits drop default;
+
+create index if not exists agent_profiles_referred_by_idx
+  on public.agent_profiles (referred_by, membership_status);
 
 create table if not exists public.agent_membership_payments (
   id uuid primary key default gen_random_uuid(),

@@ -44,6 +44,8 @@ enrollmentForm.addEventListener("submit", async (event) => {
   const button = document.getElementById("enroll-submit");
   const message = document.getElementById("enroll-message");
   const body = Object.fromEntries(new FormData(enrollmentForm));
+  const referrerId = new URLSearchParams(window.location.search).get("ref");
+  if (referrerId) body.referrerId = referrerId;
   button.disabled = true;
   button.textContent = "Preparing secure payment…";
   showFormMessage(message, "");
