@@ -79,9 +79,15 @@ function startDeliveryRefresh() {
     return null;
   }
 
-  const timer = setInterval(refreshPendingDeliveries, INTERVAL_MS);
+  const runRefresh = () => {
+    void refreshPendingDeliveries().catch((error) => {
+      console.error("Delivery refresh worker failed:", error?.message || error);
+    });
+  };
+
+  const timer = setInterval(runRefresh, INTERVAL_MS);
   timer.unref?.();
-  refreshPendingDeliveries();
+  runRefresh();
   console.log(`Datamart status refresh enabled every ${INTERVAL_MS}ms.`);
   return timer;
 }

@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "test": "node --test src/services/paymentService.test.js src/controllers/checkoutController.test.js src/controllers/webhookController.test.js src/routes/api.test.js"
+    "test": "node --test src/services/deliveryRefreshService.test.js src/services/paymentService.test.js src/controllers/checkoutController.test.js src/controllers/webhookController.test.js src/routes/api.test.js"
   },
   "engines": {
     "node": ">=18"
