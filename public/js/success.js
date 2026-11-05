@@ -2,6 +2,8 @@ const params = new URLSearchParams(window.location.search);
 const orderId = params.get("orderId");
 const demo = params.get("demo");
 const reference = params.get("reference") || params.get("trxref") || orderId;
+const trackingLink = document.getElementById("track-purchase-link");
+if (trackingLink && orderId) trackingLink.href = `/track.html?purchaseId=${encodeURIComponent(orderId)}`;
 let latestOrder = null;
 function renderDeliveryTime(order) {
   latestOrder = order;

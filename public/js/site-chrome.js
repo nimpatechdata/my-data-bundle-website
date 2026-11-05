@@ -91,6 +91,7 @@
       <a href="/agents.html">Reseller Registration</a>
       <a href="/agent-dashboard.html">Reseller Login</a>
       <a href="/checkout.html">Buy Data</a>
+      <a href="/track.html">Track Purchase</a>
     </nav>
     <span>© ${year} Nimpatech Data. All rights reserved.</span>`;
   if (!existingFooter) document.body.appendChild(footer);

@@ -282,9 +282,53 @@ async function confirmPayment(req, res) {
   }
 }
 
+async function trackOrders(req, res) {
+  try {
+    const lookup = String(req.body?.lookup || "").trim();
+    if (!lookup) return res.status(400).json({ error: "Enter your purchase ID or phone number." });
+
+    let matches;
+    const normalizedPhone = normalizeGhanaNumber(lookup);
+    if (isValidGhanaMobile(normalizedPhone)) {
+      matches = (await orders.listOrders())
+        .filter((order) => normalizeGhanaNumber(order.phone) === normalizedPhone)
+        .sort((left, right) => new Date(right.createdAt) - new Date(left.createdAt))
+        .slice(0, 20);
+    } else if (/^ord_[a-f\d]{64}$/i.test(lookup)) {
+      const order = await orders.getOrder(lookup);
+      matches = order ? [order] : [];
+    } else {
+      return res.status(400).json({ error: "Enter a valid Ghana phone number or purchase ID." });
+    }
+
+    if (!matches.length) return res.status(404).json({ error: "No purchases found. Check the details and try again." });
+
+    return res.json({ orders: matches.map((order) => ({
+      id: order.id,
+      status: order.status,
+      networkName: order.networkName,
+      size: order.size,
+      priceGhs: order.priceGhs,
+      createdAt: order.createdAt,
+      delivery: order.delivery ? {
+        delivered: Boolean(order.delivery.delivered),
+        failed: Boolean(order.delivery.failed),
+        startedAt: order.delivery.startedAt || order.createdAt,
+        deliveredAt: order.delivery.deliveredAt || null,
+        estimatedMinutes: order.delivery.estimatedMinutes || null,
+        estimatedDeliveryAt: order.delivery.estimatedDeliveryAt || null
+      } : null
+    })) });
+  } catch (error) {
+    console.error("Order tracking lookup failed:", error.message);
+    return res.status(503).json({ error: "Purchase tracking is temporarily unavailable. Please try again." });
+  }
+}
+
 module.exports = {
   catalog,
   createCheckout,
   getOrder,
+  trackOrders,
   confirmPayment
 };

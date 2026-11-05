@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071a35">
+  <meta name="robots" content="noindex,follow">
+  <title>Track your purchase | NImpatech</title>
+  <link rel="icon" type="image/svg+xml" href="/img/favicon.svg">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/tracker.css">
+</head>
+<body>
+  <main class="wrap tracker-page">
+    <header class="tracker-header"><a class="logo" href="/"><img class="brand-logo" src="/img/logo.svg" alt="" width="30" height="30">NImpatech <span>data bundles</span></a><a class="btn btn-ghost" href="/">Buy bundles</a></header>
+    <section class="panel tracker-panel" aria-labelledby="tracker-title">
+      <p class="kicker">PURCHASE TRACKER</p>
+      <h1 id="tracker-title">Track your data bundle</h1>
+      <p class="lead">Enter the purchase ID or the phone number used for the order.</p>
+      <form class="tracker-form" id="tracker-form">
+        <label for="tracker-lookup">Purchase ID or phone number</label>
+        <div class="tracker-form__row"><input id="tracker-lookup" name="lookup" type="text" autocomplete="on" placeholder="Purchase ID or 0241234567" required><button class="btn btn-primary" id="tracker-submit" type="submit">Find purchase</button></div>
+      </form>
+      <p class="tracker-message" id="tracker-message" role="status" aria-live="polite"></p>
+      <section class="tracker-results" id="tracker-results" aria-live="polite"></section>
+    </section>
+  </main>
+  <script src="/js/tracker.js" defer></script>
+  <script src="/js/site-chrome.js" defer></script>
+</body>
+</html>

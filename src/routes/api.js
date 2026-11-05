@@ -24,6 +24,7 @@ router.post("/analytics/visit", analyticsController.recordVisit);
 router.get("/blog", blogController.listPublished);
 
 router.post("/checkout", checkoutController.createCheckout);
+router.post("/orders/track", checkoutController.trackOrders);
 router.get("/orders/:id", checkoutController.getOrder);
 router.post("/payments/confirm", checkoutController.confirmPayment);
 
